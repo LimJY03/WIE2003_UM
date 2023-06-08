@@ -1,5 +1,5 @@
 import pandas as pd
-from components import *
+from components import display_result, emptylines, header, input_prediction
 
 def home():
     '''Home Page'''
@@ -16,18 +16,10 @@ def about():
 def booking():
     '''Booking Page'''
 
-    df = pd.read_csv('./data/airbnb_data_clean.csv').iloc[:, 1:]
-
     # UI
     header('Booking')
-
-    search, sort_by = searchbar()
-   
-    query_result = df[df.apply(lambda row: search in row['name_of_listing'], axis=1)].sort_values(**sort_by)
-
     emptylines(3)
-
-    display_result(query_result)
+    display_result()
 
 def budgeting():
     '''Budgeting Page'''
