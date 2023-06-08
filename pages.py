@@ -1,4 +1,3 @@
-import pandas as pd
 from components import display_result, emptylines, header, input_prediction
 
 def home():
