@@ -93,7 +93,7 @@ def display_result():
     max_per_page=10
 
     search, sort_by, city, room = searchbar()
-   
+
     query_result = df[df.apply(lambda row: search in row['name_of_listing'], axis=1)].sort_values(**sort_by)
     query_result = query_result[(query_result['city'] == city) & (query_result['room_type'] == room)]
 
@@ -101,6 +101,7 @@ def display_result():
 
     upper_bound = min(max_per_page, len(query_result))
 
+    emptylines(3)
     st.write(f'Search result (Showing {0 if no_result else 1} - {upper_bound}) of {len(query_result)}')
 
     if no_result: st.markdown('### No result')
@@ -118,8 +119,7 @@ def display_result():
                             Minimum Nights Required: {row['minimum_nights']}  
                             Host ID: {row['host_id']}
                             ''')
-                if col2.button('Book', key=f'book{i}'): print('book')
-                else: st.empty()
+                col2.button('Book', key=f'book{i}')
 
 def input_prediction():
     '''Get user input for prediction'''
