@@ -9,5 +9,5 @@ streamlit run App.py
 If you are running from terminal in GitHub Codespaces, paste the following:
 
 ```sh
-streamlit run app.py --server.enableCORS false --server.enableXsrfProtection false
+streamlit run App.py --server.enableCORS false --server.enableXsrfProtection false
 ```
