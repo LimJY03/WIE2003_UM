@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 from PIL import Image
 from model import predict
@@ -13,7 +14,7 @@ def emptylines(n: int) -> None:
     for _ in range(n): 
         st.write('')
 
-def get_state():
+def get_state() -> str:
     '''Create state widget'''
 
     states_dict = {
@@ -52,9 +53,14 @@ def get_state():
                                          'Los Angeles', 'Nashville', 'New Orleans', 'New York City', 'Oakland',
                                          'Pacific Grove', 'Portland', 'Rhode Island', 'Salem', 'San Clara Country',
                                          'Santa Cruz County', 'San Diego', 'San Francisco', 'San Mateo County',
-                                         'Seattle', 'Twin Cities MSA', 'Washington D.C.']
+                                         'Seattle', 'Twin Cities MSA', 'Washington D.C.'])
     return states_dict[city]
 
+def get_roomtype() -> str:
+    '''Create room selection widget'''
+
+    room = st.selectbox('Select room type:', ['Shared room', 'Entire home/apt', 'Hotel room', 'Private room'])
+    return room
 
 def searchbar() -> st.container():
     '''Create a search bar'''
@@ -73,34 +79,47 @@ def searchbar() -> st.container():
 
     with st.container():
 
-        col1, col2 - st.columns{2}
+        col1, col2 = st.columns(2)
         
         with col1: city = get_state()
+        with col2: room = get_roomtype()
 
-    return search_bar, sort_by
+    return search_bar, sort_by, city, room
 
-def display_result(query_result, initial=0, max_per_page=10):
+def display_result():
     '''Display query result in formatted layout'''
+    
+    df = pd.read_csv('./data/airbnb_data_clean.csv').iloc[:, 1:]
+    max_per_page=10
 
-    upper_bound = min(initial + max_per_page, len(query_result))
+    search, sort_by, city, room = searchbar()
+   
+    query_result = df[df.apply(lambda row: search in row['name_of_listing'], axis=1)].sort_values(**sort_by)
+    query_result = query_result[(query_result['city'] == city) & (query_result['room_type'] == room)]
 
-    st.write(f'Search result (Showing {initial + 1} - {upper_bound}) of {len(query_result)}')
+    no_result = len(query_result) == 0
 
-    for i in range(initial, min(initial + max_per_page, len(query_result))):
+    upper_bound = min(max_per_page, len(query_result))
 
-        row = query_result.iloc[i]
+    st.write(f'Search result (Showing {0 if no_result else 1} - {upper_bound}) of {len(query_result)}')
 
-        with st.container():
-            
-            col1, col2 = st.columns([1, 2])
-            col1.image(Image.open('./assets/img_placeholder.jpg'))
-            col2.markdown('### {}'.format(row['name_of_listing']))
-            col2.markdown(f'''Price: ${row['price']}  
-                          Minimum Nights Required: {row['minimum_nights']}  
-                          Host ID: {row['host_id']}
-                          ''')
-            if col2.button('Book', key=f'book{i}'): print('book')
-            else: st.empty()
+    if no_result: st.markdown('### No result')
+    else: 
+        for i in range(min(max_per_page, len(query_result))):
+
+            row = query_result.iloc[i]
+
+            with st.container():
+                
+                col1, col2 = st.columns([1, 2])
+                col1.image(Image.open('./assets/img_placeholder.jpg'))
+                col2.markdown(f'''### {row['name_of_listing']}''')
+                col2.markdown(f'''Price: ${row['price']}  
+                            Minimum Nights Required: {row['minimum_nights']}  
+                            Host ID: {row['host_id']}
+                            ''')
+                if col2.button('Book', key=f'book{i}'): print('book')
+                else: st.empty()
 
 def input_prediction():
     '''Get user input for prediction'''
@@ -117,8 +136,7 @@ def input_prediction():
     user_input_arr[1] = col1.number_input('Number of reviews', min_value=0, value=1)
     
     with col2: city = get_state()
-
-    room = col3.selectbox('Select room type:', ['Shared room', 'Entire home/apt', 'Hotel room', 'Private room'])
+    with col3: room = get_roomtype()
 
     if city != 'WA': user_input_arr[feature_col.index(city)] = 1
     if room != 'Shared room': user_input_arr[feature_col.index(room)] = 1
@@ -126,5 +144,5 @@ def input_prediction():
     if st.button('Predict'): 
         result = predict(user_input_arr)
         emptylines(3)
-        st.write(f'The airbnb price of the configuration above is about')
+        st.write('The airbnb price of the configuration above is about')
         st.title(f'${round(result, 2)}')
