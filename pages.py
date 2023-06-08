@@ -1,7 +1,5 @@
-import pickle as pkl
 import pandas as pd
-import tensorflow as tf
-from components import searchbar, header, emptylines, display_result
+from components import *
 
 def home():
     '''Home Page'''
@@ -34,9 +32,6 @@ def booking():
 def budgeting():
     '''Budgeting Page'''
 
-    # Loading models
-    nlp_model = tf.keras.models.load_model('./model/nlp_model')
-    reg_model = pkl.load(open('./model/model.pkl', 'rb'))
-
     # UI
     header('Budgeting')
+    input_prediction()
