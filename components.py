@@ -1,6 +1,9 @@
 import pandas as pd
 import streamlit as st
+import matplotlib.pyplot as plt
 import pydeck as pdk
+import math
+import random
 from PIL import Image
 from model import predict
 
@@ -100,43 +103,60 @@ def emptylines(num_of_lines: int) -> None:
 def show_3d_map() -> None:
     '''Display 3D Map'''
 
-    city = st.selectbox('Select a city', get_states_dict().keys())
+    col1, col2 = st.columns([1, 4])
+
+    with col1:
+
+        with st.form('airbnb_dist'):
+
+            city = st.selectbox('Select a city', get_states_dict().keys())
+            room = []
+            
+            if st.checkbox('Shared Room', value=True): room.append('Shared room')
+            if st.checkbox('Entire Home/Apt', value=True): room.append('Entire home/apt')
+            if st.checkbox('Hotel Room', value=True): room.append('Hotel room')
+            if st.checkbox('Private Room', value=True): room.append('Private room')
+            
+            st.form_submit_button('Display', use_container_width=True)
 
     map_data = get_data()
-    coords = map_data[map_data['city'] == get_states_dict()[city]][['latitude', 'longitude']]
+    coords = map_data[(map_data['city'] == get_states_dict()[city]) & 
+                      (map_data['room_type'].isin(room))][['latitude', 'longitude']]
 
     latitude, longitude = get_lat_lon(city)
 
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=latitude,
-            longitude=longitude,
-            zoom=11,
-            pitch=50,
-        ),
-        layers=[
-            pdk.Layer(
-                'HexagonLayer',
-                data=coords,
-                get_position='[longitude, latitude]',
-                radius=200,
-                elevation_scale=4,
-                elevation_range=[0, 1000],
-                pickable=True,
-                extruded=True,
-            ),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=coords,
-                get_position='[longitude, latitude]',
-                get_color='[200, 30, 0, 160]',
-                get_radius=200,
-            ),
-        ],
-    ))
+    with col2:
 
-    st.write('Height of bar represents the number of airbnb in that area')
+        st.info('Height of bar represents the number of airbnb in that area')
+
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=latitude,
+                longitude=longitude,
+                zoom=11,
+                pitch=50,
+            ),
+            layers=[
+                pdk.Layer(
+                    'HexagonLayer',
+                    data=coords,
+                    get_position='[longitude, latitude]',
+                    radius=200,
+                    elevation_scale=4,
+                    elevation_range=[0, 1000],
+                    pickable=True,
+                    extruded=True,
+                ),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=coords,
+                    get_position='[longitude, latitude]',
+                    get_color='[200, 30, 0, 160]',
+                    get_radius=200,
+                ),
+            ],
+        ))
 
 
 def get_state() -> str:
@@ -156,12 +176,66 @@ def get_roomtype() -> str:
     return room
 
 
+def recommendation_form():
+    '''Create a form to recommend airbnb'''
+
+    states_dict = get_states_dict()
+
+    with st.form(key='recommendation_box'):
+
+        city = st.selectbox('Select a city', states_dict.keys())
+        budget = st.number_input('Enter your budget', min_value=1.0, value=80.1, step=1.0)
+        submit = st.form_submit_button('Show Recommendation', use_container_width=True)
+
+    if submit:
+
+        data = get_data()
+        data = data[data['city'] == states_dict[city]]
+        values = data['price'].tolist() + [budget]
+        
+        width = math.ceil((max(values) - min(values)) / 50)
+
+        col1, col2 = st.columns([1, 2])
+        
+        with col1:
+            
+            fig, ax = plt.subplots()
+            _, _, patches = ax.hist(values, bins=50)
+
+            patches[int((budget - min(values)) // width)].set_fc('r')
+
+            st.write(f'Your budget in {city}\'s airbnb price range')
+            st.pyplot(fig)
+
+        with col2:
+
+            choice = data[data['price'] <= budget]
+            selected = random.choices(list(choice.index), k=10)
+
+            st.write('Recommended Airbnbs')
+
+            for i in selected:
+
+                row = data.iloc[i]
+
+                with st.container():
+
+                    col1, col2 = st.columns([1, 2])
+                    col1.image(Image.open('./assets/img_placeholder.jpg'))
+                    col2.markdown(f'''### {row['name_of_listing']}''')
+                    col2.markdown(f'''Price: ${row['price']}  
+                                Minimum Nights Required: {row['minimum_nights']}  
+                                Host ID: {row['host_id']}
+                                ''')
+                    col2.button('Book', key=i)
+
+
 def searchbar() -> tuple[str]:
     '''Create a search bar'''
 
     with st.container():
 
-        col1, col2 = st.columns([6, 2])
+        col1, col2, col3, col4 = st.columns([6, 2, 2, 2])
         search_bar = col1.text_input('Search a keyword:', placeholder='Search')
         filter_by = col2.selectbox('Sort by:', ['Most Popular',
                                                 'Price (Descending)', 'Price (Ascending)',
@@ -171,13 +245,9 @@ def searchbar() -> tuple[str]:
                           'minimum_nights' if 'Nights' in filter_by else 'number_of_reviews'],
                    'ascending': 'Ascending' in filter_by}
 
-    with st.container():
-
-        col1, col2 = st.columns(2)
-
-        with col1:
+        with col3:
             city = get_state()
-        with col2:
+        with col4:
             room = get_roomtype()
 
     return search_bar, sort_by, city, room
@@ -213,16 +283,16 @@ def display_result():
 
             row = query_result.iloc[i]
 
-            with st.container():
+            with st.form(f'airbnb{i}'):
 
-                col1, col2 = st.columns([1, 2])
+                col1, col2 = st.columns([1, 5])
                 col1.image(Image.open('./assets/img_placeholder.jpg'))
                 col2.markdown(f'''### {row['name_of_listing']}''')
                 col2.markdown(f'''Price: ${row['price']}  
                             Minimum Nights Required: {row['minimum_nights']}  
                             Host ID: {row['host_id']}
                             ''')
-                col2.button('Book', key=f'book{i}')
+                col2.form_submit_button('Book')
 
 
 def input_prediction():
