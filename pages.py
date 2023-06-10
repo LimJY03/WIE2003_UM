@@ -1,4 +1,4 @@
-from components import display_result, emptylines, header, input_prediction
+from components import header, show_3d_map, emptylines, display_result, input_prediction
 
 def home():
     '''Home Page'''
@@ -11,6 +11,8 @@ def about():
 
     # UI
     header('About')
+    show_3d_map()
+    
 
 def booking():
     '''Booking Page'''
