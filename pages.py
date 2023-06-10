@@ -6,13 +6,13 @@ def home():
     # UI
     header('Home')
 
-def about():
-    '''About Page'''
 
-    # UI
-    header('About')
-    show_3d_map()
+def dist():
+    '''Show airbnb distribution by city'''
     
+    # UI
+    header('Airbnb Distribution')
+    show_3d_map()
 
 def booking():
     '''Booking Page'''
@@ -28,3 +28,10 @@ def budgeting():
     # UI
     header('Budgeting')
     input_prediction()
+
+
+def about():
+    '''About Page'''
+
+    # UI
+    header('About')
