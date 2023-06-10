@@ -93,6 +93,12 @@ def header(heading: str):
     st.markdown('---')
 
 
+def h3(heading: str):
+    '''Heading 3 format'''
+
+    st.markdown(f'### {heading}')
+
+
 def emptylines(num_of_lines: int) -> None:
     '''Create n empty lines'''
 
@@ -235,13 +241,13 @@ def recommendation_form():
 
             else:
 
-                st.markdown('### No result')
+                h3('No result')
 
 
-def searchbar() -> tuple[str]:
+def searchbooking() -> None:
     '''Create a search bar'''
 
-    with st.container():
+    with st.form('booking'):
 
         col1, col2, col3, col4 = st.columns([6, 2, 2, 2])
         search_bar = col1.text_input('Search a keyword:', placeholder='Search')
@@ -258,16 +264,18 @@ def searchbar() -> tuple[str]:
         with col4:
             room = get_roomtype()
 
-    return search_bar, sort_by, city, room
+        search = st.form_submit_button('Search')
+
+    if search:
+
+        display_result(search_bar, sort_by, city, room)
 
 
-def display_result():
+def display_result(search, sort_by, city, room):
     '''Display query result in formatted layout'''
 
     data = get_data()
     max_per_page = 10
-
-    search, sort_by, city, room = searchbar()
 
     query_result = data[
         data.apply(lambda row: search in row['name_of_listing'], axis=1)
@@ -285,7 +293,7 @@ def display_result():
     st.write(f'Search result (Showing {0 if no_result else 1} - {upper_bound}) of {len(query_result)}')
 
     if no_result:
-        st.markdown('### No result')
+        h3('No result')
     else:
         for i in range(min(max_per_page, len(query_result))):
 
@@ -296,9 +304,9 @@ def display_result():
                 col1, col2 = st.columns([1, 5])
                 col1.image(Image.open('./assets/img_placeholder.jpg'))
                 col2.markdown(f'''### {row['name_of_listing']}''')
-                col2.markdown(f'''Price: ${row['price']}  
-                            Minimum Nights Required: {row['minimum_nights']}  
-                            Host ID: {row['host_id']}
+                col2.markdown(f'''**Price:** ${row['price']}  
+                            **Minimum Nights Required:** {row['minimum_nights']}  
+                            **Host ID:** {row['host_id']}
                             ''')
                 col2.form_submit_button('Book')
 
@@ -336,3 +344,43 @@ def input_prediction():
         emptylines(3)
         st.write('The airbnb price of the configuration above is about')
         st.title(f'${round(result, 2)}')
+
+
+def homepage_content() -> None:
+    '''Show content on Home Page'''
+
+    h3('Project Background')
+    st.markdown('Since its founding in 2008, Airbnb has grown rapidly through its value creation using the sharing economy business model. Citizens from **over 220 nations** use it and there are 4 million hosts worldwide. According to [Airbnb Statistics [2023]: User & Market Growth Data (2022, August 3)](https://ipropertymanagement.com/research/airbnb-statistics), over 1 billion stays have been booked by more than 150 million users worldwide.There are **21 nights reserved** for the typical Airbnb property in the U.S. each month. In 2021, the average Airbnb occupancy rate in the U.S. was **48%**.')
+    st.markdown('Based on [Hati, S. R. H., Balqiah, T. E., Hananto, A., & Yuliati, E. (2021)](https://doi.org/10.1016/j.heliyon.2021.e08222), accommodations on Airbnb are **frequently less expensive than conventional accommodations** like a hotel. Additionally, Airbnb provides customers with the chance to **experience local authenticity** by letting them stay in a listed flat or private room and live like a local. With Airbnb, property owners can get the most out of their underutilised properties and increase their revenue.')
+    st.markdown('As we know, the sharing economy business model has a **significant impact** on the travel industry. This dynamic creates a workable substitute for conventional services, enabling travellers to **personalise their journeys** and **enrich their experiences**. ')
+    st.markdown('Hence, our team has come up with a project that **aids in Airbnb pricing prediction** and **suggests** the most affordable accommodations for consumers. The analysis findings may be used by Airbnb hosts to **refine their listings** and **increase their revenue**. Additionally, this may be advantageous to tourists looking for **high-calibre**, **reasonably-priced** Airbnb listings.')
+    emptylines(3)
+    h3('Project Objectives')
+    st.markdown('''
+    1. To **identify opportunities** for hosts based on the insights  
+    2. To **analyse and predict** Airbnb prices to understand its market  
+    3. To **recommend** the most suitable Airbnb accommodation at the optimum price''')
+
+
+def aboutpage_content() -> None:
+    '''Shows content on About Page'''
+
+    col1, _, col2 = st.columns([6, 1, 2])
+
+    with col1:
+
+        h3('About Our Team')
+        st.markdown('We are a group of undergraduate students taking the WIE2003 **Introduction to Data Science** course in the Faculty of Computer Science and Information Technology, Universiti Malaya.')
+        st.markdown('**Low Hui Yi** is our team leader as well as the project manager. She checks and ensures that all progresses are following the planned timeline.')
+        emptylines(3)
+        h3('About This Product')
+
+    with col2:
+
+        h3('Contributors')
+        st.markdown('''
+        * Lim Jun Yi ([linktree](https://linktr.ee/limjy03))  
+        * Tessa Shalini Shadeep ()  
+        * Low Hui Yi ()  
+        * Wong Yi Fei ()  
+        * Oon Yee Sem ()''')

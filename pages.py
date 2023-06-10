@@ -1,39 +1,39 @@
-from components import header, recommendation_form, show_3d_map, emptylines, display_result, input_prediction
+from components import header, homepage_content, recommendation_form, show_3d_map, searchbooking, input_prediction, aboutpage_content
 
 def home():
     '''Home Page'''
 
     # UI
-    header('Home')
+    header('🏡 Home')
+    homepage_content()
 
 
 def dist():
     '''Show airbnb distribution by city'''
     
     # UI
-    header('Airbnb Distribution')
+    header('🌏 Airbnb Distribution')
     show_3d_map()
 
 def booking_assistant():
     '''Recommendation Page'''
 
     # UI
-    header('Booking Assistant')
+    header('🤵🏻 Booking Assistant')
     recommendation_form()
 
 def booking():
     '''Booking Page'''
 
     # UI
-    header('Booking')
-    emptylines(3)
-    display_result()
+    header('📆 Booking')
+    searchbooking()
 
 def budgeting():
     '''Budgeting Page'''
 
     # UI
-    header('Budgeting')
+    header('💵 Budgeting')
     input_prediction()
 
 
@@ -41,4 +41,5 @@ def about():
     '''About Page'''
 
     # UI
-    header('About')
+    header('📋 About')
+    aboutpage_content()

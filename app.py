@@ -11,18 +11,18 @@ st.set_page_config(
 
 # Select page
 page_info = {
-    'Home': home,
-    'Airbnb Distributions': dist,
-    'Booking Assistant': booking_assistant,
-    'Booking': booking,
-    'Budgeting': budgeting,
-    'About': about,
+    '🏡 Home': home,
+    '🌏 Airbnb Distributions': dist,
+    '🤵🏻 Booking Assistant': booking_assistant,
+    '📆 Booking': booking,
+    '💵 Budgeting': budgeting,
+    '📋 About': about,
 }
 
 # UI
 with st.sidebar:
 
-    st.title('Menu')
-    page = st.radio('Navigate to', page_info.keys())
+    st.title('Navigate to')
+    page = st.radio('Navigate to', page_info.keys(), label_visibility='hidden')
 
 page_info[page]()
