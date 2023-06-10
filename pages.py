@@ -1,4 +1,4 @@
-from components import header, show_3d_map, emptylines, display_result, input_prediction
+from components import header, recommendation_form, show_3d_map, emptylines, display_result, input_prediction
 
 def home():
     '''Home Page'''
@@ -13,6 +13,13 @@ def dist():
     # UI
     header('Airbnb Distribution')
     show_3d_map()
+
+def booking_assistant():
+    '''Recommendation Page'''
+
+    # UI
+    header('Booking Assistant')
+    recommendation_form()
 
 def booking():
     '''Booking Page'''
