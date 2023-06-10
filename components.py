@@ -1,18 +1,62 @@
 import pandas as pd
 import streamlit as st
+import pydeck as pdk
 from PIL import Image
 from model import predict
 
-def header(s: str):
+@st.cache_data
+def get_data():
+    '''Load data into dataframe'''
 
-    st.title(s)
+    dataframe = pd.read_csv('./data/airbnb_data_clean.csv').iloc[:, 1:]
+    return dataframe
+
+def header(heading: str):
+    '''Format page header'''
+
+    st.title(heading)
     st.markdown('---')
 
-def emptylines(n: int) -> None:
+def emptylines(num_of_lines: int) -> None:
     '''Create n empty lines'''
 
-    for _ in range(n): 
+    for _ in range(num_of_lines):
         st.write('')
+
+def show_3d_map():
+    '''Display 3D Map'''
+
+    map_data = pd.DataFrame()
+    map_data[['lat', 'lon']] = get_data()[['latitude', 'longitude']]
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=37.0902,
+            longitude=95.7129,
+            zoom=3,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'HexagonLayer',
+                data=map_data,
+                get_position='[lon, lat]',
+                radius=2000,
+                elevation_scale=4,
+                elevation_range=[0, 1000],
+                pickable=True,
+                extruded=True,
+            ),
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=map_data,
+                get_position='[lon, lat]',
+                get_color='[200, 30, 0, 160]',
+                get_radius=2000,
+            ),
+        ],
+    ))
 
 def get_state() -> str:
     '''Create state widget'''
@@ -89,7 +133,7 @@ def searchbar() -> st.container():
 def display_result():
     '''Display query result in formatted layout'''
     
-    df = pd.read_csv('./data/airbnb_data_clean.csv').iloc[:, 1:]
+    df = get_data()
     max_per_page=10
 
     search, sort_by, city, room = searchbar()
