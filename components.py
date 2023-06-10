@@ -216,7 +216,7 @@ def recommendation_form():
             if len(choice) > 0:
 
                 selected = random.sample(range(len(choice)), min(len(choice), 10))
-                
+
                 for i in selected:
 
                     print(i)
@@ -312,24 +312,26 @@ def input_prediction():
 
     user_input_arr = ['cozy'] + [0] * 23
 
-    col1, col2, col3 = st.columns([1, 2, 2])
+    with st.form(key='prediction'):
 
-    user_input_arr[0] = st.text_input(
-        'Keyword in Airbnb:', placeholder='Enter a keyword')
-    user_input_arr[1] = col1.number_input(
-        'Number of reviews', min_value=0, value=1)
+        col1, col2, col3 = st.columns([1, 2, 2])
 
-    with col2:
-        city = get_state()
-    with col3:
-        room = get_roomtype()
+        user_input_arr[0] = st.text_input('Keyword in Airbnb:', placeholder='Enter a keyword')
+        user_input_arr[1] = col1.number_input('Number of reviews', min_value=0, value=1)
+
+        with col2:
+            city = get_state()
+        with col3:
+            room = get_roomtype()
+
+        make_prediction = st.form_submit_button('Predict', use_container_width=True)
 
     if city != 'WA':
         user_input_arr[feature_col.index(city)] = 1
     if room != 'Shared room':
         user_input_arr[feature_col.index(room)] = 1
 
-    if st.button('Predict'):
+    if make_prediction:
         result = predict(user_input_arr)
         emptylines(3)
         st.write('The airbnb price of the configuration above is about')
