@@ -202,32 +202,40 @@ def recommendation_form():
             fig, ax = plt.subplots()
             _, _, patches = ax.hist(values, bins=50)
 
-            patches[int((budget - min(values)) // width)].set_fc('r')
+            patches[int((budget - min(values) - (1 if budget != min(values) else 0)) // width)].set_fc('r')
 
             st.write(f'Your budget in {city}\'s airbnb price range')
             st.pyplot(fig)
 
         with col2:
 
-            choice = data[data['price'] <= budget]
-            selected = random.choices(list(choice.index), k=10)
+            choice = data[data['price'] <= budget].index
 
             st.write('Recommended Airbnbs')
 
-            for i in selected:
+            if len(choice) > 0:
 
-                row = data.iloc[i]
+                selected = random.sample(range(len(choice)), min(len(choice), 10))
+                
+                for i in selected:
 
-                with st.container():
+                    print(i)
+                    row = data.loc[choice[i]]
 
-                    col1, col2 = st.columns([1, 2])
-                    col1.image(Image.open('./assets/img_placeholder.jpg'))
-                    col2.markdown(f'''### {row['name_of_listing']}''')
-                    col2.markdown(f'''Price: ${row['price']}  
-                                Minimum Nights Required: {row['minimum_nights']}  
-                                Host ID: {row['host_id']}
-                                ''')
-                    col2.button('Book', key=i)
+                    with st.container():
+
+                        col1, col2 = st.columns([1, 2])
+                        col1.image(Image.open('./assets/img_placeholder.jpg'))
+                        col2.markdown(f'''### {row['name_of_listing']}''')
+                        col2.markdown(f'''Price: ${row['price']}  
+                                    Minimum Nights Required: {row['minimum_nights']}  
+                                    Host ID: {row['host_id']}
+                                    ''')
+                        col2.button('Book', key=i)
+
+            else:
+
+                st.markdown('### No result')
 
 
 def searchbar() -> tuple[str]:
