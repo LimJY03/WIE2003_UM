@@ -1,9 +1,9 @@
+import math
+import random
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import pydeck as pdk
-import math
-import random
 from PIL import Image
 from model import predict
 
@@ -372,6 +372,8 @@ def aboutpage_content() -> None:
         h3('About Our Team')
         st.markdown('We are a group of undergraduate students taking the WIE2003 **Introduction to Data Science** course in the Faculty of Computer Science and Information Technology, Universiti Malaya.')
         st.markdown('**Low Hui Yi** is our team leader as well as the project manager. She checks and ensures that all progresses are following the planned timeline.')
+        st.markdown('**Lim Jun Yi** is the main developer for the Machine Learning Models and this Streamlit App.')
+        st.markdown('**Oon Yee Sem, Tessa and Wong Yi Fei** are the main data scientist in cleaning, processing and analyzing the data to discover insights and prepare the data for Model Training.')
         emptylines(3)
         h3('About This Product')
 
@@ -380,7 +382,7 @@ def aboutpage_content() -> None:
         h3('Contributors')
         st.markdown('''
         * Lim Jun Yi ([linktree](https://linktr.ee/limjy03))  
-        * Tessa Shalini Shadeep ()  
+        * Tessa Shalini Pradeep ()  
         * Low Hui Yi ()  
         * Wong Yi Fei ()  
         * Oon Yee Sem ()''')
